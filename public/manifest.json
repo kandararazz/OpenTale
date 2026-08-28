@@ -1,0 +1,16 @@
+{
+  "short_name": "OpenTale",
+  "name": "OpenTale - Interactive Digital Reading Platform",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#ff7b54",
+  "display": "standalone",
+  "orientation": "portrait"
+}

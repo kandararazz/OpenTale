@@ -117,6 +117,82 @@ export const ReadingProvider = ({ children }) => {
   const [availableVoices, setAvailableVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
 
+  // Daily Reading Goals & Streak Tracker State
+  const [dailyTracker, setDailyTracker] = useState(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    try {
+      const saved = localStorage.getItem('opentale_daily_tracker');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.date === todayStr) {
+          return parsed;
+        } else {
+          // New day! Maintain or reset streak
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toISOString().split('T')[0];
+          const maintainedStreak = parsed.date === yesterdayStr && parsed.minutes >= 10 ? parsed.streak + 1 : 1;
+          return { date: todayStr, minutes: 0, streak: maintainedStreak, target: 20 };
+        }
+      }
+    } catch (e) {}
+    return { date: todayStr, minutes: 12, streak: 5, target: 20 };
+  });
+
+  const todayMinutesRead = dailyTracker.minutes;
+  const dailyStreak = dailyTracker.streak;
+  const targetMinutes = dailyTracker.target;
+
+  // Auto Night Shift State (Sun set / Night dimming)
+  const [isAutoNightShift, setIsAutoNightShift] = useState(() => {
+    try {
+      const saved = localStorage.getItem('opentale_auto_night_shift');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch (e) {
+      return true;
+    }
+  });
+
+  // Active Reading Minute Accumulator
+  useEffect(() => {
+    let interval = null;
+    if (activeTab === 'reader') {
+      interval = setInterval(() => {
+        setDailyTracker(prev => {
+          const updated = { ...prev, minutes: prev.minutes + 1 };
+          try {
+            localStorage.setItem('opentale_daily_tracker', JSON.stringify(updated));
+          } catch (e) {}
+          return updated;
+        });
+      }, 60000); // Increment 1 minute every 60s spent reading
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activeTab]);
+
+  // Automatic Night Shift sunset check
+  useEffect(() => {
+    if (isAutoNightShift) {
+      const currentHour = new Date().getHours();
+      // If between 7 PM (19:00) and 7 AM (07:00), apply warm sepia or oled
+      if (currentHour >= 19 || currentHour < 7) {
+        setReaderSettings(prev => ({
+          ...prev,
+          readerTheme: prev.readerTheme === 'white' ? 'sepia' : prev.readerTheme
+        }));
+      }
+    }
+  }, [isAutoNightShift]);
+
+  // Save Auto Night Shift Setting
+  useEffect(() => {
+    try {
+      localStorage.setItem('opentale_auto_night_shift', JSON.stringify(isAutoNightShift));
+    } catch (e) {}
+  }, [isAutoNightShift]);
+
   // Modals & Drawers
   const [activeVocabTooltip, setActiveVocabTooltip] = useState(null);
   const [activeQuizModalBook, setActiveQuizModalBook] = useState(null);
@@ -127,6 +203,7 @@ export const ReadingProvider = ({ children }) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAICatchUpOpen, setIsAICatchUpOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [isTocOpen, setIsTocOpen] = useState(false);
 
   const [celebrationToast, setCelebrationToast] = useState(null);
 
@@ -411,6 +488,13 @@ export const ReadingProvider = ({ children }) => {
       setIsAICatchUpOpen,
       isSearchModalOpen,
       setIsSearchModalOpen,
+      isTocOpen,
+      setIsTocOpen,
+      todayMinutesRead,
+      targetMinutes,
+      dailyStreak,
+      isAutoNightShift,
+      setIsAutoNightShift,
       celebrationToast,
       triggerConfetti,
       showToast

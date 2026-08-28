@@ -4,7 +4,7 @@ import { parseUploadedFile } from '../utils/fileParser';
 import { 
   ArrowLeft, ArrowRight, Bookmark, Volume2, VolumeX, Play, Pause, 
   X, HelpCircle, Highlighter, MessageSquare,
-  Search, Upload, Loader2
+  Search, Upload, Loader2, List, Copy, Moon, Sun
 } from 'lucide-react';
 
 export const ReaderView = () => {
@@ -27,9 +27,12 @@ export const ReaderView = () => {
     setDoubleTapWord,
     setIsMarginaliaOpen,
     setIsSearchModalOpen,
+    setIsTocOpen,
     addCustomBook,
     readerSettings,
     setReaderSettings,
+    isAutoNightShift,
+    setIsAutoNightShift,
     showToast
   } = useReading();
 
@@ -123,6 +126,10 @@ export const ReaderView = () => {
           document.exitFullscreen().catch(() => {});
         }
       } 
+      // Table of Contents Drawer: C
+      else if (e.key === 'c' || e.key === 'C') {
+        setIsTocOpen(prev => !prev);
+      }
       // Play / Pause Speech Narration: Space
       else if (e.key === ' ') {
         e.preventDefault();
@@ -140,7 +147,7 @@ export const ReaderView = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goToNextPage, goToPrevPage, speakCurrentPage, readerTheme, isSettingsOpen, setActiveTab, setIsSearchModalOpen]);
+  }, [goToNextPage, goToPrevPage, speakCurrentPage, readerTheme, isSettingsOpen, setActiveTab, setIsSearchModalOpen, setIsTocOpen]);
 
   // Drag and Drop Overlay handlers for direct file upload in Reader
   const handleDragOver = (e) => {
@@ -335,9 +342,19 @@ export const ReaderView = () => {
             </select>
           </div>
 
-          {/* Right: Search, Settings, Bookmark, Audio */}
+          {/* Right: Search, TOC, Settings, Bookmark, Audio */}
           <div className="flex items-center gap-2">
             
+            {/* Table of Contents Button (C) */}
+            <button
+              onClick={() => setIsTocOpen(true)}
+              className="p-2 rounded-full hover:bg-black/10 transition-all flex items-center gap-1 opacity-80 hover:opacity-100"
+              title="Table of Contents (C)"
+            >
+              <List className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span className="text-xs font-bold hidden sm:inline">Contents</span>
+            </button>
+
             {/* Instant In-Book Text Search Button (⌘F) */}
             <button
               onClick={() => setIsSearchModalOpen(true)}
@@ -386,6 +403,23 @@ export const ReaderView = () => {
             <h4 className="font-sans font-bold text-xs uppercase tracking-wider opacity-80">Reading Customization</h4>
             <button onClick={() => setIsSettingsOpen(false)} className="p-1 rounded-full hover:bg-black/10">
               <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Auto Night Shift Sunset Toggle */}
+          <div className="flex items-center justify-between bg-black/5 p-3 rounded-2xl">
+            <div className="flex items-center gap-2 text-xs font-semibold">
+              <Moon className="w-4 h-4 text-amber-500" />
+              <span>Auto Night Shift at Sunset</span>
+            </div>
+            <button
+              onClick={() => {
+                setIsAutoNightShift(!isAutoNightShift);
+                showToast(isAutoNightShift ? 'Auto Night Shift Disabled' : 'Auto Night Shift Enabled 🌅');
+              }}
+              className={`w-10 h-6 rounded-full transition-colors relative p-0.5 ${isAutoNightShift ? 'bg-amber-500' : 'bg-slate-300'}`}
+            >
+              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${isAutoNightShift ? 'translate-x-4' : 'translate-x-0'}`}></div>
             </button>
           </div>
 
@@ -441,57 +475,47 @@ export const ReaderView = () => {
             </div>
           </div>
 
-          {/* Column Width Slider */}
-          {layoutMode === 'single' && (
-            <div className="space-y-2 border-t border-current/10 pt-3">
-              <div className="flex justify-between items-center text-xs font-semibold opacity-75">
-                <span>Text Column Width</span>
-                <span>{columnWidthPx}px</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold opacity-60">Narrow</span>
-                <input
-                  type="range"
-                  min="480"
-                  max="1024"
-                  step="30"
-                  value={columnWidthPx}
-                  onChange={(e) => setColumnWidthPx(Number(e.target.value))}
-                  className="flex-1 accent-amber-500 cursor-pointer"
-                />
-                <span className="text-[10px] font-bold opacity-60">Wide</span>
-              </div>
-            </div>
-          )}
-
-          {/* Font Size Controls */}
+          {/* Precise ±5% Font Scaling Controls */}
           <div className="space-y-2 border-t border-current/10 pt-3">
             <div className="flex justify-between items-center text-xs font-semibold opacity-75">
-              <span>Font Size</span>
+              <span>Font Size (±5% Zoom)</span>
               <span>{fontSizePercent}%</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setFontSizePercent(prev => Math.max(90, prev - 10))}
-                className="w-10 h-10 rounded-2xl bg-black/5 hover:bg-black/10 flex items-center justify-center font-bold text-sm"
+                onClick={() => setFontSizePercent(prev => Math.max(80, prev - 5))}
+                className="w-10 h-10 rounded-2xl bg-black/5 hover:bg-black/10 flex items-center justify-center font-bold text-xs"
+                title="-5% Font Size"
               >
-                A-
+                -5%
               </button>
               <input
                 type="range"
-                min="90"
-                max="150"
-                step="10"
+                min="80"
+                max="180"
+                step="5"
                 value={fontSizePercent}
                 onChange={(e) => setFontSizePercent(Number(e.target.value))}
                 className="flex-1 accent-amber-500 cursor-pointer"
               />
               <button
-                onClick={() => setFontSizePercent(prev => Math.min(150, prev + 10))}
-                className="w-10 h-10 rounded-2xl bg-black/5 hover:bg-black/10 flex items-center justify-center font-bold text-lg"
+                onClick={() => setFontSizePercent(prev => Math.min(180, prev + 5))}
+                className="w-10 h-10 rounded-2xl bg-black/5 hover:bg-black/10 flex items-center justify-center font-bold text-xs"
+                title="+5% Font Size"
               >
-                A+
+                +5%
               </button>
+            </div>
+            <div className="flex items-center justify-between gap-1 pt-1">
+              {[100, 125, 150].map(sz => (
+                <button
+                  key={sz}
+                  onClick={() => setFontSizePercent(sz)}
+                  className={`flex-1 py-1 rounded-xl text-[10px] font-bold transition-colors ${fontSizePercent === sz ? 'bg-amber-500 text-white shadow-2xs' : 'bg-black/5 opacity-70 hover:opacity-100'}`}
+                >
+                  {sz}%
+                </button>
+              ))}
             </div>
           </div>
 
@@ -619,6 +643,17 @@ export const ReaderView = () => {
             className="hover:text-amber-300 flex items-center gap-1"
           >
             <Highlighter className="w-3.5 h-3.5 text-yellow-400" /> Highlight
+          </button>
+          <button 
+            onClick={() => {
+              const citation = `“${selectedText}”\n— ${currentBook?.title || 'OpenTale'}, ${currentPage?.title || 'Chapter ' + (activePageIndex + 1)} (By ${currentBook?.author || 'Author'})`;
+              navigator.clipboard.writeText(citation);
+              showToast('Quote copied with citation! 📋', '📋');
+              setSelectionTooltipPos(null);
+            }}
+            className="hover:text-amber-300 flex items-center gap-1"
+          >
+            <Copy className="w-3.5 h-3.5 text-emerald-400" /> Copy Quote
           </button>
           <div className="w-px h-3 bg-slate-700"></div>
           <button 

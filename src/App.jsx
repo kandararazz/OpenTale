@@ -14,6 +14,7 @@ import { SocialMarginaliaDrawer } from './components/SocialMarginaliaDrawer';
 import { LibraryImportModal } from './components/LibraryImportModal';
 import { AICatchUpModal } from './components/AICatchUpModal';
 import { InBookSearchModal } from './components/InBookSearchModal';
+import { TableOfContentsDrawer } from './components/TableOfContentsDrawer';
 import { OpenTaleAppIcon } from './components/OpenTaleLogo';
 import { Heart, Shield } from 'lucide-react';
 
@@ -34,7 +35,9 @@ const MainAppContent = () => {
     isAICatchUpOpen,
     setIsAICatchUpOpen,
     isSearchModalOpen,
-    setIsSearchModalOpen
+    setIsSearchModalOpen,
+    isTocOpen,
+    setIsTocOpen
   } = useReading();
 
   const currentPage = currentBook?.pages[activePageIndex];
@@ -99,6 +102,11 @@ const MainAppContent = () => {
       <InBookSearchModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
+      />
+
+      <TableOfContentsDrawer
+        isOpen={isTocOpen}
+        onClose={() => setIsTocOpen(false)}
       />
 
       {/* Footer */}

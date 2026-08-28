@@ -11,8 +11,13 @@ export const Navbar = () => {
     setActiveTab, 
     unlockedBadgeIds, 
     vocabVault,
-    setIsImportModalOpen
+    setIsImportModalOpen,
+    todayMinutesRead,
+    targetMinutes,
+    dailyStreak
   } = useReading();
+
+  const minutesPercent = Math.min(100, Math.round((todayMinutesRead / targetMinutes) * 100));
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-colors duration-300">
@@ -34,6 +39,23 @@ export const Navbar = () => {
               </span>
             </div>
             <p className="text-[10px] text-cozy-muted font-sans font-medium tracking-wide leading-none">Interactive Reading Platform</p>
+          </div>
+        </div>
+
+        {/* Header Reading Goal Tracker & Streak Pill (Quiet Habit Consistency) */}
+        <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-bold shadow-2xs">
+          <span className="flex items-center gap-1 text-amber-600">
+            🔥 <strong className="text-slate-900 font-extrabold">{dailyStreak}</strong> Day Streak
+          </span>
+          <span className="w-px h-3 bg-slate-300"></span>
+          <div className="flex items-center gap-2">
+            <span>{todayMinutesRead} / {targetMinutes}m today</span>
+            <div className="w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-amber-500 rounded-full transition-all duration-500" 
+                style={{ width: `${minutesPercent}%` }}
+              ></div>
+            </div>
           </div>
         </div>
 
