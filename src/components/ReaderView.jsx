@@ -39,6 +39,7 @@ export const ReaderView = () => {
   const [fontSizePercent, setFontSizePercent] = useState(readerSettings?.fontSizePercent || 110); // 90 to 150
   const [lineHeightClass, setLineHeightClass] = useState(readerSettings?.lineHeightClass || 'leading-relaxed'); // 'leading-snug' | 'leading-relaxed' | 'leading-loose'
   const [columnWidthPx, setColumnWidthPx] = useState(readerSettings?.columnWidthPx || 720); // 480 to 1024
+  const [layoutMode, setLayoutMode] = useState('single'); // 'single' | 'spread'
 
   // Drag and Drop & UI Popovers
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -319,9 +320,19 @@ export const ReaderView = () => {
             </h2>
           </div>
 
-          {/* Center: Current Chapter Title */}
-          <div className="hidden md:block text-xs font-bold opacity-75 uppercase tracking-widest truncate max-w-xs">
-            {currentPage?.title || `Chapter ${activePageIndex + 1}`}
+          {/* Center: Current Chapter Title & Selector Dropdown */}
+          <div className="hidden md:flex items-center gap-1">
+            <select
+              value={activePageIndex}
+              onChange={(e) => setActivePageIndex(Number(e.target.value))}
+              className="text-xs font-bold bg-black/5 hover:bg-black/10 py-1.5 px-3 rounded-full border-none focus:ring-1 focus:ring-amber-500 cursor-pointer max-w-xs truncate text-current"
+            >
+              {currentBook?.pages?.map((pg, idx) => (
+                <option key={idx} value={idx}>
+                  Chapter {idx + 1}: {pg.title || `Section ${idx + 1}`}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Right: Search, Settings, Bookmark, Audio */}
@@ -378,8 +389,27 @@ export const ReaderView = () => {
             </button>
           </div>
 
-          {/* Theme Switcher */}
+          {/* Reading View Mode (Single Column vs Two-Page Book Spread) */}
           <div className="space-y-2">
+            <span className="text-xs font-semibold opacity-75">Layout View Mode</span>
+            <div className="grid grid-cols-2 gap-2 bg-black/5 p-1 rounded-2xl">
+              <button
+                onClick={() => setLayoutMode('single')}
+                className={`py-2 rounded-xl text-xs font-bold transition-all ${layoutMode === 'single' ? 'bg-amber-500 text-white shadow-sm' : 'opacity-70 hover:opacity-100'}`}
+              >
+                Single Scroll
+              </button>
+              <button
+                onClick={() => setLayoutMode('spread')}
+                className={`py-2 rounded-xl text-xs font-bold transition-all ${layoutMode === 'spread' ? 'bg-amber-500 text-white shadow-sm' : 'opacity-70 hover:opacity-100'}`}
+              >
+                Book Spread 📖
+              </button>
+            </div>
+          </div>
+
+          {/* Theme Switcher */}
+          <div className="space-y-2 border-t border-current/10 pt-3">
             <div className="flex justify-between items-center text-xs font-semibold opacity-75">
               <span>Canvas Theme</span>
               <span className="text-[10px] opacity-60">Hotkey: T</span>
@@ -411,26 +441,28 @@ export const ReaderView = () => {
             </div>
           </div>
 
-          {/* Column Width Slider (Narrow Phone-style to Wide Long-Form Editorial) */}
-          <div className="space-y-2 border-t border-current/10 pt-3">
-            <div className="flex justify-between items-center text-xs font-semibold opacity-75">
-              <span>Text Column Width</span>
-              <span>{columnWidthPx}px</span>
+          {/* Column Width Slider */}
+          {layoutMode === 'single' && (
+            <div className="space-y-2 border-t border-current/10 pt-3">
+              <div className="flex justify-between items-center text-xs font-semibold opacity-75">
+                <span>Text Column Width</span>
+                <span>{columnWidthPx}px</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-bold opacity-60">Narrow</span>
+                <input
+                  type="range"
+                  min="480"
+                  max="1024"
+                  step="30"
+                  value={columnWidthPx}
+                  onChange={(e) => setColumnWidthPx(Number(e.target.value))}
+                  className="flex-1 accent-amber-500 cursor-pointer"
+                />
+                <span className="text-[10px] font-bold opacity-60">Wide</span>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold opacity-60">Narrow</span>
-              <input
-                type="range"
-                min="480"
-                max="1024"
-                step="30"
-                value={columnWidthPx}
-                onChange={(e) => setColumnWidthPx(Number(e.target.value))}
-                className="flex-1 accent-amber-500 cursor-pointer"
-              />
-              <span className="text-[10px] font-bold opacity-60">Wide</span>
-            </div>
-          </div>
+          )}
 
           {/* Font Size Controls */}
           <div className="space-y-2 border-t border-current/10 pt-3">
@@ -482,30 +514,85 @@ export const ReaderView = () => {
 
       {/* 3. CORE EDITORIAL READING CANVAS */}
       <main className="pt-24 pb-36 px-4 sm:px-6">
-        <div 
-          ref={canvasRef}
-          onMouseUp={handleMouseUp}
-          className={`mx-auto transition-all duration-300 ${fontStyle === 'serif' ? 'font-serif' : 'font-sans'}`}
-          style={{ 
-            maxWidth: `${columnWidthPx}px`,
-            fontSize: `${fontSizePercent}%` 
-          }}
-        >
-          {/* Chapter Opening Header */}
-          <div className="text-center space-y-3 mb-12 pb-8 border-b border-current/10">
-            <span className="text-xs uppercase tracking-widest font-bold opacity-60">
-              Page {activePageIndex + 1} of {totalPages}
-            </span>
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              {currentPage?.title || `Chapter ${activePageIndex + 1}`}
-            </h1>
-          </div>
+        {layoutMode === 'single' ? (
+          /* Single Column Editorial Layout */
+          <div 
+            ref={canvasRef}
+            onMouseUp={handleMouseUp}
+            className={`mx-auto transition-all duration-300 ${fontStyle === 'serif' ? 'font-serif' : 'font-sans'}`}
+            style={{ 
+              maxWidth: `${columnWidthPx}px`,
+              fontSize: `${fontSizePercent}%` 
+            }}
+          >
+            {/* Chapter Opening Header */}
+            <div className="text-center space-y-3 mb-12 pb-8 border-b border-current/10">
+              <span className="text-xs uppercase tracking-widest font-bold opacity-60">
+                Page {activePageIndex + 1} of {totalPages}
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                {currentPage?.title || `Chapter ${activePageIndex + 1}`}
+              </h1>
+            </div>
 
-          {/* Chapter Body Text */}
-          <div className="prose max-w-none text-current font-normal tracking-normal">
-            {renderFormattedParagraphs(currentPage?.text)}
+            {/* Chapter Body Text */}
+            <div className="prose max-w-none text-current font-normal tracking-normal">
+              {renderFormattedParagraphs(currentPage?.text)}
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Two-Page Book Spread Layout (Simulates Physical Book / E-Reader) */
+          <div 
+            ref={canvasRef}
+            onMouseUp={handleMouseUp}
+            className={`max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 relative p-6 sm:p-10 rounded-3xl shadow-xl border border-current/10 bg-current/5 transition-all duration-300 ${fontStyle === 'serif' ? 'font-serif' : 'font-sans'}`}
+            style={{ fontSize: `${fontSizePercent}%` }}
+          >
+            {/* Center Gutter Spine Line */}
+            <div className="hidden md:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-current/20 shadow-xs pointer-events-none"></div>
+
+            {/* Left Page */}
+            <div className="space-y-6">
+              <div className="text-center pb-4 border-b border-current/10">
+                <span className="text-[11px] uppercase tracking-widest font-bold opacity-60">
+                  Left Page • Page {activePageIndex + 1}
+                </span>
+                <h3 className="font-serif text-2xl font-bold mt-1">
+                  {currentPage?.title || `Chapter ${activePageIndex + 1}`}
+                </h3>
+              </div>
+              <div className="prose max-w-none text-current font-normal leading-relaxed">
+                {renderFormattedParagraphs(currentPage?.text)}
+              </div>
+            </div>
+
+            {/* Right Page (Next Chapter / Section if available) */}
+            <div className="space-y-6 hidden md:block border-t md:border-t-0 pt-6 md:pt-0 border-current/10">
+              {activePageIndex + 1 < totalPages ? (
+                <>
+                  <div className="text-center pb-4 border-b border-current/10">
+                    <span className="text-[11px] uppercase tracking-widest font-bold opacity-60">
+                      Right Page • Page {activePageIndex + 2}
+                    </span>
+                    <h3 className="font-serif text-2xl font-bold mt-1">
+                      {currentBook?.pages[activePageIndex + 1]?.title || `Chapter ${activePageIndex + 2}`}
+                    </h3>
+                  </div>
+                  <div className="prose max-w-none text-current font-normal leading-relaxed">
+                    {renderFormattedParagraphs(currentBook?.pages[activePageIndex + 1]?.text)}
+                  </div>
+                </>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-60 space-y-3">
+                  <span className="text-4xl">🎉</span>
+                  <h4 className="font-serif text-xl font-bold">End of Story</h4>
+                  <p className="text-xs">You have reached the final page of this adventure!</p>
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
       </main>
 
       {/* Text Selection Floating Action Tooltip */}

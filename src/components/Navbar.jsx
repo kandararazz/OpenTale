@@ -25,9 +25,12 @@ export const Navbar = () => {
         >
           <OpenTaleAppIcon className="w-9 h-9 sm:w-10 sm:h-10 group-hover:scale-105 transition-transform duration-300 shadow-sm" />
           <div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <span className="font-sans text-xl sm:text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white">
                 OpenTale
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-peach-100 text-peach-800 text-[10px] font-bold shadow-2xs border border-peach-200/60">
+                by Raza
               </span>
             </div>
             <p className="text-[10px] text-cozy-muted font-sans font-medium tracking-wide leading-none">Interactive Reading Platform</p>
