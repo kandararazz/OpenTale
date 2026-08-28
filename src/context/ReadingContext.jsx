@@ -446,7 +446,6 @@ export const ReadingProvider = ({ children }) => {
       ambientVolume,
       changeAmbientVolume,
       readingProgress,
-      readingStreak,
       completedBookIds,
       unlockedBadgeIds,
       unlockBadge,

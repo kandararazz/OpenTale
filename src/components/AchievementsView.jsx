@@ -4,7 +4,7 @@ import { BADGES } from '../data/stories';
 import { Flame, Award, Lock, Sparkles, CheckCircle, Trophy, BookOpen } from 'lucide-react';
 
 export const AchievementsView = () => {
-  const { unlockedBadgeIds, readingStreak, completedBookIds, setActiveTab } = useReading();
+  const { unlockedBadgeIds = [], todayMinutesRead = 0, targetMinutes = 20, completedBookIds = [], setActiveTab } = useReading() || {};
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -16,15 +16,15 @@ export const AchievementsView = () => {
             Gamified Milestones
           </span>
           <h1 className="font-playful text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Reading Badges & Streaks 🏆
+            Reading Badges & Accomplishments 🏆
           </h1>
           <p className="text-white/90 text-sm sm:text-base">
-            Keep up your daily reading habit to keep your flame streak alive and unlock special reader badges!
+            Keep reading daily to hit your reading goal and unlock special reader badges!
           </p>
         </div>
 
         <div className="hidden md:flex items-center justify-center w-24 h-24 rounded-full bg-white/20 backdrop-blur-md text-6xl shadow-inner-soft animate-pulse">
-          🔥
+          📖
         </div>
       </div>
 
@@ -33,14 +33,14 @@ export const AchievementsView = () => {
         
         <div className="bg-white p-6 rounded-3xl border border-cozy-border shadow-cozy flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-3xl">
-            🔥
+            ⏱️
           </div>
           <div>
-            <p className="text-xs font-bold text-cozy-muted uppercase tracking-wider">Current Streak</p>
+            <p className="text-xs font-bold text-cozy-muted uppercase tracking-wider">Today's Progress</p>
             <h3 className="font-playful text-2xl font-extrabold text-orange-600">
-              {readingStreak} Days
+              {todayMinutesRead} / {targetMinutes} Mins
             </h3>
-            <p className="text-xs text-sage-600 font-medium">Daily Goal Active!</p>
+            <p className="text-xs text-sage-600 font-medium">Daily Target Active</p>
           </div>
         </div>
 
