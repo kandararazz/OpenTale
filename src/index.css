@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-slate-900 transition-colors duration-300 min-h-screen flex flex-col;
+  }
+}
+
+/* Reader View Theme Customizations */
+.theme-light {
+  --bg-color: #FFFFFF;
+  --text-color: #2D2825;
+  --border-color: #E8E1D5;
+  --accent-glow: rgba(255, 123, 84, 0.1);
+}
+
+.theme-sepia {
+  --bg-color: #F4ECD8;
+  --text-color: #433422;
+  --border-color: #E5D6B8;
+  --accent-glow: rgba(212, 143, 56, 0.15);
+}
+
+.theme-dark {
+  --bg-color: #1A1829;
+  --text-color: #E6E4F0;
+  --border-color: #2D2945;
+  --accent-glow: rgba(136, 98, 205, 0.25);
+}
+
+/* Custom Scrollbar for story text */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(132, 181, 159, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(132, 181, 159, 0.7);
+}
+
+/* Flip book 3D container */
+.perspective-1000 {
+  perspective: 1200px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Dyslexic-Friendly text styling overrides */
+.dyslexic-font {
+  font-family: 'Lexend', 'Comic Sans MS', sans-serif !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.15em !important;
+  line-height: 1.8 !important;
+}
+
+/* Highlighted word animation */
+@keyframes vocabGlow {
+  0%, 100% { background-color: rgba(255, 239, 179, 0.8); }
+  50% { background-color: rgba(255, 160, 122, 0.6); }
+}
+
+.vocab-highlight {
+  @apply cursor-pointer font-medium border-b-2 border-dashed border-peach-400 text-peach-700 bg-butter-200/80 px-1 py-0.5 rounded transition-all duration-200 hover:bg-peach-300 hover:text-peach-900 hover:border-peach-600 hover:scale-105 inline-block;
+}
+
+.vocab-highlight-active {
+  animation: vocabGlow 1.5s infinite ease-in-out;
+}
