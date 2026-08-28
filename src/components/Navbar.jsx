@@ -13,14 +13,13 @@ export const Navbar = () => {
     vocabVault,
     setIsImportModalOpen,
     todayMinutesRead,
-    targetMinutes,
-    dailyStreak
+    targetMinutes
   } = useReading();
 
   const minutesPercent = Math.min(100, Math.round((todayMinutesRead / targetMinutes) * 100));
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-colors duration-300">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-100 transition-colors duration-300 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand Logo (Sleek & Proportional) */}
@@ -42,70 +41,65 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Header Reading Goal Tracker & Streak Pill (Quiet Habit Consistency) */}
-        <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-bold shadow-2xs">
-          <span className="flex items-center gap-1 text-amber-600">
-            🔥 <strong className="text-slate-900 font-extrabold">{dailyStreak}</strong> Day Streak
-          </span>
-          <span className="w-px h-3 bg-slate-300"></span>
-          <div className="flex items-center gap-2">
-            <span>{todayMinutesRead} / {targetMinutes}m today</span>
-            <div className="w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-amber-500 rounded-full transition-all duration-500" 
-                style={{ width: `${minutesPercent}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <nav className="hidden xl:flex items-center gap-1.5 bg-cozy-card/90 p-1.5 rounded-full border border-cozy-border shadow-inner-soft">
+        {/* Navigation Tabs (Centered & Prominent) */}
+        <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/60 shadow-inner-soft">
           <button
             onClick={() => setActiveTab('landing')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'landing' ? 'bg-peach-500 text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'landing' ? 'bg-peach-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Sparkles className="w-4 h-4" /> Explore
+            <Sparkles className="w-3.5 h-3.5" /> Explore
           </button>
 
           <button
             onClick={() => setActiveTab('library')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'library' || activeTab === 'reader' ? 'bg-peach-500 text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'library' || activeTab === 'reader' ? 'bg-peach-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <BookOpen className="w-4 h-4" /> Library
+            <BookOpen className="w-3.5 h-3.5" /> Library
           </button>
 
           <button
             onClick={() => setActiveTab('vocab')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'vocab' ? 'bg-peach-500 text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'vocab' ? 'bg-peach-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <BookMarked className="w-4 h-4" /> Vocab ({vocabVault.length})
+            <BookMarked className="w-3.5 h-3.5" /> Vocab ({vocabVault.length})
           </button>
 
           <button
             onClick={() => setActiveTab('badges')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'badges' ? 'bg-peach-500 text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'badges' ? 'bg-peach-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Award className="w-4 h-4" /> Badges ({unlockedBadgeIds.length})
+            <Award className="w-3.5 h-3.5" /> Badges ({unlockedBadgeIds.length})
           </button>
         </nav>
 
-        {/* Action Button: Sync/Export */}
+        {/* Action Button & Reading Timer Pill */}
         <div className="flex items-center gap-3">
+          
+          {/* Subtle Today Reading Time Pill */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600">
+            <span>{todayMinutesRead}m read today</span>
+            <div className="w-8 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-peach-500 rounded-full transition-all duration-500" 
+                style={{ width: `${minutesPercent}%` }}
+              ></div>
+            </div>
+          </div>
+
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-peach-100 text-peach-800 hover:bg-peach-200 transition-colors text-xs font-bold shadow-xs"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-peach-500 hover:bg-peach-600 text-white transition-colors text-xs font-bold shadow-xs"
             title="Import EPUB/PDF or Export Notes"
           >
-            <Database className="w-4 h-4 text-peach-600" /> Sync / Export
+            <Database className="w-3.5 h-3.5 text-white" /> Sync / Export
           </button>
         </div>
 

@@ -86,7 +86,6 @@ export const ReadingProvider = ({ children }) => {
     }
   });
 
-  const [readingStreak, setReadingStreak] = useState(5);
   const [completedBookIds, setCompletedBookIds] = useState(['whispering-woods']);
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState(['first-story', 'night-reader']);
   
@@ -117,7 +116,7 @@ export const ReadingProvider = ({ children }) => {
   const [availableVoices, setAvailableVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
 
-  // Daily Reading Goals & Streak Tracker State
+  // Daily Reading Tracker State
   const [dailyTracker, setDailyTracker] = useState(() => {
     const todayStr = new Date().toISOString().split('T')[0];
     try {
@@ -127,20 +126,14 @@ export const ReadingProvider = ({ children }) => {
         if (parsed.date === todayStr) {
           return parsed;
         } else {
-          // New day! Maintain or reset streak
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          const yesterdayStr = yesterday.toISOString().split('T')[0];
-          const maintainedStreak = parsed.date === yesterdayStr && parsed.minutes >= 10 ? parsed.streak + 1 : 1;
-          return { date: todayStr, minutes: 0, streak: maintainedStreak, target: 20 };
+          return { date: todayStr, minutes: 0, target: 20 };
         }
       }
     } catch (e) {}
-    return { date: todayStr, minutes: 12, streak: 5, target: 20 };
+    return { date: todayStr, minutes: 12, target: 20 };
   });
 
   const todayMinutesRead = dailyTracker.minutes;
-  const dailyStreak = dailyTracker.streak;
   const targetMinutes = dailyTracker.target;
 
   // Auto Night Shift State (Sun set / Night dimming)
@@ -492,7 +485,6 @@ export const ReadingProvider = ({ children }) => {
       setIsTocOpen,
       todayMinutesRead,
       targetMinutes,
-      dailyStreak,
       isAutoNightShift,
       setIsAutoNightShift,
       celebrationToast,
