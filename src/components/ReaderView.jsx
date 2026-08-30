@@ -5,7 +5,7 @@ import { calculateBookReadingTime } from '../utils/readingEngine';
 import {
   ArrowLeft, ArrowRight, Bookmark, Volume2, VolumeX, Play, Pause,
   X, HelpCircle, Highlighter, MessageSquare,
-  Search, Upload, Loader2, List, Copy, Moon, Sun
+  Search, Upload, Loader2, List, Copy, Moon, Sun, Sparkles
 } from 'lucide-react';
 
 export const ReaderView = () => {
