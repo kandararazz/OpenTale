@@ -3,6 +3,29 @@
  */
 
 /**
+ * Calculate read time string from text (WPM: 100 for kids/read-aloud, 200 for standard)
+ * @param {string} text - The input text content
+ * @param {boolean} [isKidsStory=false] - Whether to calculate at kids reading aloud speed (100 WPM)
+ * @returns {string} Formatted reading time string (e.g. "2 min read", "< 1 min read", "0 min read")
+ */
+export function calculateReadTime(text, isKidsStory = false) {
+  if (!text || text.trim().length === 0) return "0 min read";
+
+  // Count words by splitting on whitespace
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+
+  // 100 WPM for reading aloud / kids (ages 4-5); 200 WPM for standard reading
+  const wordsPerMinute = isKidsStory ? 100 : 200;
+  const minutes = Math.ceil(words / wordsPerMinute);
+
+  if (words < wordsPerMinute && !isKidsStory) {
+    return "< 1 min read";
+  }
+
+  return `${minutes} min read`;
+}
+
+/**
  * Accurately calculate story reading time in minutes based on total word count (200 wpm) or metadata
  */
 export function calculateBookReadingTime(book) {
@@ -11,7 +34,9 @@ export function calculateBookReadingTime(book) {
     const fullText = book.pages.map(p => p.text || '').join(' ');
     const wordCount = fullText.trim().split(/\s+/).filter(Boolean).length;
     if (wordCount > 0) {
-      return Math.max(1, Math.ceil(wordCount / 200));
+      const isKids = (book.readingLevel && (book.readingLevel.includes('4') || book.readingLevel.includes('5') || book.readingLevel.includes('Kids')));
+      const wordsPerMinute = isKids ? 100 : 200;
+      return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
     }
   }
   return book.estimatedMinutes ? Math.max(1, parseInt(book.estimatedMinutes, 10)) : 1;
