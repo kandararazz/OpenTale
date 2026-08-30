@@ -134,7 +134,7 @@ const MainAppContent = () => {
             <div>
               <span className="font-sans text-xl font-extrabold text-slate-800">OpenTale</span>
               <p className="text-xs text-cozy-muted font-medium">
-                Created by <strong className="text-peach-600 font-bold">Raza</strong> • Crafted with <Heart className="w-3.5 h-3.5 text-rose-500 inline fill-rose-500 mx-0.5" /> for passionate readers.
+                Crafted with <Heart className="w-3.5 h-3.5 text-rose-500 inline fill-rose-500 mx-0.5" /> for passionate readers.
               </p>
             </div>
           </div>

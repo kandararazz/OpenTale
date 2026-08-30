@@ -33,9 +33,6 @@ export const Navbar = () => {
               <span className="font-sans text-xl sm:text-2xl font-extrabold tracking-tight text-slate-800">
                 OpenTale
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-peach-100 text-peach-800 text-[10px] font-bold shadow-2xs border border-peach-200/60">
-                by Raza
-              </span>
             </div>
             <p className="text-[10px] text-cozy-muted font-sans font-medium tracking-wide leading-none">Interactive Reading Platform</p>
           </div>
