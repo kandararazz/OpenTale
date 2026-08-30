@@ -32,6 +32,7 @@ export const ReaderView = () => {
     setIsMarginaliaOpen,
     setIsSearchModalOpen,
     setIsTocOpen,
+    setIsCoverModalOpen,
     addCustomBook,
     readerSettings,
     setReaderSettings,
@@ -358,6 +359,16 @@ export const ReaderView = () => {
             >
               <List className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               <span className="text-xs font-bold hidden sm:inline">Contents</span>
+            </button>
+
+            {/* Instant Chapter Cover Art Button */}
+            <button
+              onClick={() => setIsCoverModalOpen(true)}
+              className="p-2 rounded-full hover:bg-black/10 transition-all flex items-center gap-1 opacity-80 hover:opacity-100"
+              title="Instant Chapter Cover Art"
+            >
+              <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-xs font-bold hidden sm:inline">Cover Art</span>
             </button>
 
             {/* Instant In-Book Text Search Button (⌘F) */}

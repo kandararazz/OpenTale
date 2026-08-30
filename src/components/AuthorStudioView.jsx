@@ -246,6 +246,12 @@ export const AuthorStudioView = () => {
         {/* Toolbar Quick Actions */}
         <div className="flex flex-wrap items-center gap-2.5 relative z-10 shrink-0">
           <button
+            onClick={() => setIsCoverModalOpen(true)}
+            className="px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" /> Cover Art
+          </button>
+          <button
             onClick={handleSaveToLibrary}
             className="px-4 py-2.5 rounded-2xl bg-peach-500 hover:bg-peach-600 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
           >
