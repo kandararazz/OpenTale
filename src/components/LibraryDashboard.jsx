@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useReading } from '../context/ReadingContext';
 import { parseUploadedFile } from '../utils/fileParser';
+import { calculateBookReadingTime } from '../utils/readingEngine';
 import { STORIES } from '../data/stories';
 import { 
   Search, Filter, BookOpen, Bookmark, Star, Clock, Sparkles, Upload, 
@@ -444,7 +445,7 @@ export const LibraryDashboard = () => {
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-xs text-cozy-muted font-medium">
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-peach-500" /> {book.estimatedMinutes} min read
+                            <Clock className="w-3.5 h-3.5 text-peach-500" /> {calculateBookReadingTime(book)} min read
                           </span>
                           <span>{totalPages} Pages</span>
                         </div>
@@ -543,7 +544,7 @@ export const LibraryDashboard = () => {
                           {book.genre}
                         </span>
                         <span className="text-xs text-cozy-muted font-medium">
-                          {book.readingLevel} • {book.estimatedMinutes}m read • {totalPages} Pages
+                          {book.readingLevel} • {calculateBookReadingTime(book)}m read • {totalPages} Pages
                         </span>
                         {assignedTagsList.map(t => (
                           <span key={t.id} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${t.bgClass} ${t.textClass} ${t.borderClass}`}>

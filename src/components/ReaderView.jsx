@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useReading } from '../context/ReadingContext';
 import { parseUploadedFile } from '../utils/fileParser';
+import { calculateBookReadingTime } from '../utils/readingEngine';
 import {
   ArrowLeft, ArrowRight, Bookmark, Volume2, VolumeX, Play, Pause,
   X, HelpCircle, Highlighter, MessageSquare,
@@ -62,7 +63,8 @@ export const ReaderView = () => {
   const currentPage = currentBook?.pages[activePageIndex];
   const totalPages = currentBook?.pages?.length || 1;
   const progressPercent = Math.round(((activePageIndex + 1) / totalPages) * 100);
-  const estMinutesLeft = Math.max(1, Math.round(((totalPages - (activePageIndex + 1)) * (currentBook?.estimatedMinutes || 5)) / totalPages));
+  const totalBookMinutes = calculateBookReadingTime(currentBook);
+  const estMinutesLeft = Math.max(1, Math.round(((totalPages - activePageIndex) * totalBookMinutes) / totalPages));
 
   // Keep settings synchronized in context & localStorage
   useEffect(() => {

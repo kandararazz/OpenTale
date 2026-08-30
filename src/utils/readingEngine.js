@@ -2,6 +2,21 @@
  * OpenTale Reading & Bionic Text Utilities
  */
 
+/**
+ * Accurately calculate story reading time in minutes based on total word count (200 wpm) or metadata
+ */
+export function calculateBookReadingTime(book) {
+  if (!book) return 1;
+  if (book.pages && Array.isArray(book.pages) && book.pages.length > 0) {
+    const fullText = book.pages.map(p => p.text || '').join(' ');
+    const wordCount = fullText.trim().split(/\s+/).filter(Boolean).length;
+    if (wordCount > 0) {
+      return Math.max(1, Math.ceil(wordCount / 200));
+    }
+  }
+  return book.estimatedMinutes ? Math.max(1, parseInt(book.estimatedMinutes, 10)) : 1;
+}
+
 // Bionic Reading Converter: Highlights first letters of words for faster eye fixation
 export function toBionicHTML(text) {
   if (!text) return '';
