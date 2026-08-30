@@ -1,9 +1,25 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { STORIES, BADGES } from '../data/stories';
 import { ambientAudio } from '../utils/ambientAudio';
+import { supabaseClient } from '../utils/supabaseClient';
 import confetti from 'canvas-confetti';
 
 const ReadingContext = createContext(null);
+
+export const DEFAULT_SHELVES = [
+  { id: 'favorites', name: 'Favorites', icon: '❤️', color: 'rose' },
+  { id: 'currently-reading', name: 'Currently Reading', icon: '📖', color: 'amber' },
+  { id: 'to-read-2026', name: 'To Read 2026', icon: '🎯', color: 'emerald' },
+  { id: 'reference', name: 'Reference', icon: '🔖', color: 'sky' }
+];
+
+export const DEFAULT_TAGS = [
+  { id: 'must-reread', name: 'Must Re-read', color: '#ef4444', bgClass: 'bg-red-100', textClass: 'text-red-700', borderClass: 'border-red-300' },
+  { id: 'scifi-epic', name: 'Sci-Fi Epic', color: '#8b5cf6', bgClass: 'bg-purple-100', textClass: 'text-purple-700', borderClass: 'border-purple-300' },
+  { id: 'bedtime', name: 'Bedtime', color: '#3b82f6', bgClass: 'bg-blue-100', textClass: 'text-blue-700', borderClass: 'border-blue-300' },
+  { id: 'quick-read', name: 'Quick Read', color: '#10b981', bgClass: 'bg-emerald-100', textClass: 'text-emerald-700', borderClass: 'border-emerald-300' },
+  { id: '5-stars', name: '5-Stars', color: '#f59e0b', bgClass: 'bg-amber-100', textClass: 'text-amber-700', borderClass: 'border-amber-300' }
+];
 
 export const ReadingProvider = ({ children }) => {
   // Saved Custom Books from Local Storage
@@ -18,9 +34,127 @@ export const ReadingProvider = ({ children }) => {
 
   const allAvailableBooks = [...STORIES, ...customBooks];
 
-  // Navigation & Active View State
-  const [activeTab, setActiveTab] = useState('landing'); // 'landing' | 'library' | 'reader' | 'vocab' | 'badges'
+  // Navigation & Active View State ('landing' | 'library' | 'reader' | 'vocab' | 'badges' | 'author')
+  const [activeTab, setActiveTab] = useState('landing');
   
+  // Custom Shelves State
+  const [shelves, setShelves] = useState(() => {
+    try {
+      const saved = localStorage.getItem('opentale_custom_shelves');
+      return saved ? JSON.parse(saved) : DEFAULT_SHELVES;
+    } catch (e) {
+      return DEFAULT_SHELVES;
+    }
+  });
+
+  // Custom Tags State
+  const [tags, setTags] = useState(() => {
+    try {
+      const saved = localStorage.getItem('opentale_custom_tags');
+      return saved ? JSON.parse(saved) : DEFAULT_TAGS;
+    } catch (e) {
+      return DEFAULT_TAGS;
+    }
+  });
+
+  // Mappings: Book ID -> Array of Shelf IDs
+  const [bookShelfMap, setBookShelfMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem('opentale_book_shelf_mappings');
+      return saved ? JSON.parse(saved) : {
+        'whispering-woods': ['favorites', 'currently-reading'],
+        'cosmic-rocket': ['to-read-2026'],
+        'enchanted-bakery': ['favorites']
+      };
+    } catch (e) {
+      return {
+        'whispering-woods': ['favorites', 'currently-reading'],
+        'cosmic-rocket': ['to-read-2026'],
+        'enchanted-bakery': ['favorites']
+      };
+    }
+  });
+
+  // Mappings: Book ID -> Array of Tag IDs
+  const [bookTagMap, setBookTagMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem('opentale_book_tag_mappings');
+      return saved ? JSON.parse(saved) : {
+        'whispering-woods': ['bedtime', '5-stars'],
+        'cosmic-rocket': ['scifi-epic', 'quick-read'],
+        'enchanted-bakery': ['5-stars']
+      };
+    } catch (e) {
+      return {
+        'whispering-woods': ['bedtime', '5-stars'],
+        'cosmic-rocket': ['scifi-epic', 'quick-read'],
+        'enchanted-bakery': ['5-stars']
+      };
+    }
+  });
+
+  // Active Shelf and Tag filters in Library
+  const [selectedShelfId, setSelectedShelfId] = useState('all'); // 'all' | shelfId
+  const [selectedTagIds, setSelectedTagIds] = useState([]); // array of tagIds
+
+  // Character & Lore Wiki (Book ID -> Array of Lore Items)
+  const [loreWikiMap, setLoreWikiMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem('opentale_lore_wiki_map');
+      return saved ? JSON.parse(saved) : {
+        'whispering-woods': [
+          { id: 'l-1', name: 'Oliver', category: 'Character', description: 'Curious young boy with a magical glowing lantern.', icon: '🧑' },
+          { id: 'l-2', name: 'Whispering Woods', category: 'Location', description: 'Ancient magical forest where trees speak in twilight.', icon: '🌲' }
+        ]
+      };
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // Community Stories
+  const [communityStories, setCommunityStories] = useState([]);
+
+  // Load Community Stories on start
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      const stories = await supabaseClient.getCommunityStories();
+      setCommunityStories(stories);
+    };
+    fetchCommunity();
+  }, []);
+
+  // Save Shelves, Tags & Mappings to LocalStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('opentale_custom_shelves', JSON.stringify(shelves));
+    } catch (e) {}
+  }, [shelves]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('opentale_custom_tags', JSON.stringify(tags));
+    } catch (e) {}
+  }, [tags]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('opentale_book_shelf_mappings', JSON.stringify(bookShelfMap));
+    } catch (e) {}
+  }, [bookShelfMap]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('opentale_book_tag_mappings', JSON.stringify(bookTagMap));
+    } catch (e) {}
+  }, [bookTagMap]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('opentale_lore_wiki_map', JSON.stringify(loreWikiMap));
+    } catch (e) {}
+  }, [loreWikiMap]);
+
   // Auto-Save Active Book & Chapter Index
   const [currentBook, setCurrentBook] = useState(() => {
     try {
@@ -65,10 +199,10 @@ export const ReadingProvider = ({ children }) => {
   });
 
   // Customization & Accessibility Preferences
-  const [themeMode, setThemeMode] = useState('light'); // 'light' | 'sepia' | 'dark' | 'sand' | 'eink' | 'oled'
-  const [fontSize, setFontSize] = useState('md'); // 'sm' | 'md' | 'lg' | 'xl'
-  const [fontFamily, setFontFamily] = useState('sans'); // 'sans' | 'playful' | 'dyslexic'
-  const [readingMode, setReadingMode] = useState('standard'); // 'standard' | 'bionic' | 'minimal' | 'rsvp'
+  const [themeMode, setThemeMode] = useState('light');
+  const [fontSize, setFontSize] = useState('md');
+  const [fontFamily, setFontFamily] = useState('sans');
+  const [readingMode, setReadingMode] = useState('standard');
   const [lineHeight, setLineHeight] = useState('1.8');
   const [letterSpacing, setLetterSpacing] = useState('0');
 
@@ -136,7 +270,7 @@ export const ReadingProvider = ({ children }) => {
   const todayMinutesRead = dailyTracker.minutes;
   const targetMinutes = dailyTracker.target;
 
-  // Auto Night Shift State (Sun set / Night dimming)
+  // Auto Night Shift State
   const [isAutoNightShift, setIsAutoNightShift] = useState(() => {
     try {
       const saved = localStorage.getItem('opentale_auto_night_shift');
@@ -158,18 +292,17 @@ export const ReadingProvider = ({ children }) => {
           } catch (e) {}
           return updated;
         });
-      }, 60000); // Increment 1 minute every 60s spent reading
+      }, 60000);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [activeTab]);
 
-  // Automatic Night Shift sunset check
+  // Automatic Night Shift check
   useEffect(() => {
     if (isAutoNightShift) {
       const currentHour = new Date().getHours();
-      // If between 7 PM (19:00) and 7 AM (07:00), apply warm sepia or oled
       if (currentHour >= 19 || currentHour < 7) {
         setReaderSettings(prev => ({
           ...prev,
@@ -197,6 +330,17 @@ export const ReadingProvider = ({ children }) => {
   const [isAICatchUpOpen, setIsAICatchUpOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isTocOpen, setIsTocOpen] = useState(false);
+
+  // New Modals for Shelves, Tags, Authoring & Publishing
+  const [isShelfModalOpen, setIsShelfModalOpen] = useState(false);
+  const [editingShelf, setEditingShelf] = useState(null);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [editingTag, setEditingTag] = useState(null);
+  const [targetBookForShelvesTags, setTargetBookForShelvesTags] = useState(null);
+  const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [targetBookForExport, setTargetBookForExport] = useState(null);
 
   const [celebrationToast, setCelebrationToast] = useState(null);
 
@@ -227,8 +371,97 @@ export const ReadingProvider = ({ children }) => {
   // Helper to add custom imported book and open immediately
   const addCustomBook = (parsedBook) => {
     setCustomBooks(prev => [parsedBook, ...prev.filter(b => b.id !== parsedBook.id)]);
+    supabaseClient.saveStory(parsedBook);
     openBookInReader(parsedBook, 0);
-    showToast(`"${parsedBook.title}" imported & opened!`, '📖');
+    showToast(`"${parsedBook.title}" saved & opened!`, '📖');
+  };
+
+  // SHELVES HANDLERS
+  const createShelf = (newShelf) => {
+    const id = newShelf.id || `shelf-${Date.now()}`;
+    const created = { id, ...newShelf };
+    setShelves(prev => [...prev.filter(s => s.id !== id), created]);
+    showToast(`Shelf "${created.name}" created!`, '📁');
+  };
+
+  const updateShelf = (shelfId, updates) => {
+    setShelves(prev => prev.map(s => s.id === shelfId ? { ...s, ...updates } : s));
+    showToast('Shelf updated!', '✨');
+  };
+
+  const deleteShelf = (shelfId) => {
+    setShelves(prev => prev.filter(s => s.id !== shelfId));
+    // Remove from book mappings
+    setBookShelfMap(prev => {
+      const copy = { ...prev };
+      Object.keys(copy).forEach(bId => {
+        copy[bId] = copy[bId].filter(id => id !== shelfId);
+      });
+      return copy;
+    });
+    if (selectedShelfId === shelfId) setSelectedShelfId('all');
+    showToast('Shelf removed', '🗑️');
+  };
+
+  const toggleBookShelf = (bookId, shelfId) => {
+    setBookShelfMap(prev => {
+      const currentShelves = prev[bookId] || [];
+      const exists = currentShelves.includes(shelfId);
+      const updated = exists ? currentShelves.filter(id => id !== shelfId) : [...currentShelves, shelfId];
+      return { ...prev, [bookId]: updated };
+    });
+  };
+
+  // TAGS HANDLERS
+  const createTag = (newTag) => {
+    const id = newTag.id || `tag-${Date.now()}`;
+    const created = { id, ...newTag };
+    setTags(prev => [...prev.filter(t => t.id !== id), created]);
+    showToast(`Tag "${created.name}" created!`, '🏷️');
+  };
+
+  const updateTag = (tagId, updates) => {
+    setTags(prev => prev.map(t => t.id === tagId ? { ...t, ...updates } : t));
+    showToast('Tag updated!', '✨');
+  };
+
+  const deleteTag = (tagId) => {
+    setTags(prev => prev.filter(t => t.id !== tagId));
+    setBookTagMap(prev => {
+      const copy = { ...prev };
+      Object.keys(copy).forEach(bId => {
+        copy[bId] = copy[bId].filter(id => id !== tagId);
+      });
+      return copy;
+    });
+    setSelectedTagIds(prev => prev.filter(id => id !== tagId));
+    showToast('Tag deleted', '🗑️');
+  };
+
+  const toggleBookTag = (bookId, tagId) => {
+    setBookTagMap(prev => {
+      const currentTags = prev[bookId] || [];
+      const exists = currentTags.includes(tagId);
+      const updated = exists ? currentTags.filter(id => id !== tagId) : [...currentTags, tagId];
+      return { ...prev, [bookId]: updated };
+    });
+  };
+
+  // LORE WIKI HANDLERS
+  const addLoreItem = (bookId, loreObj) => {
+    setLoreWikiMap(prev => {
+      const existing = prev[bookId] || [];
+      const newItem = { id: `lore-${Date.now()}`, ...loreObj };
+      return { ...prev, [bookId]: [...existing, newItem] };
+    });
+    showToast('Lore item pinned to Wiki!', '📜');
+  };
+
+  const deleteLoreItem = (bookId, loreId) => {
+    setLoreWikiMap(prev => {
+      const existing = prev[bookId] || [];
+      return { ...prev, [bookId]: existing.filter(l => l.id !== loreId) };
+    });
   };
 
   // Audio ambient track change handler
@@ -427,6 +660,27 @@ export const ReadingProvider = ({ children }) => {
       allAvailableBooks,
       customBooks,
       addCustomBook,
+      shelves,
+      createShelf,
+      updateShelf,
+      deleteShelf,
+      tags,
+      createTag,
+      updateTag,
+      deleteTag,
+      bookShelfMap,
+      toggleBookShelf,
+      bookTagMap,
+      toggleBookTag,
+      selectedShelfId,
+      setSelectedShelfId,
+      selectedTagIds,
+      setSelectedTagIds,
+      loreWikiMap,
+      addLoreItem,
+      deleteLoreItem,
+      communityStories,
+      setCommunityStories,
       readerSettings,
       setReaderSettings,
       themeMode,
@@ -482,6 +736,24 @@ export const ReadingProvider = ({ children }) => {
       setIsSearchModalOpen,
       isTocOpen,
       setIsTocOpen,
+      isShelfModalOpen,
+      setIsShelfModalOpen,
+      editingShelf,
+      setEditingShelf,
+      isTagModalOpen,
+      setIsTagModalOpen,
+      editingTag,
+      setEditingTag,
+      targetBookForShelvesTags,
+      setTargetBookForShelvesTags,
+      isCoverModalOpen,
+      setIsCoverModalOpen,
+      isPublishModalOpen,
+      setIsPublishModalOpen,
+      isExportModalOpen,
+      setIsExportModalOpen,
+      targetBookForExport,
+      setTargetBookForExport,
       todayMinutesRead,
       targetMinutes,
       isAutoNightShift,

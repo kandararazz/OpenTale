@@ -6,6 +6,7 @@ import { LibraryDashboard } from './components/LibraryDashboard';
 import { ReaderView } from './components/ReaderView';
 import { VocabVault } from './components/VocabVault';
 import { AchievementsView } from './components/AchievementsView';
+import { AuthorStudioView } from './components/AuthorStudioView';
 import { VocabTooltipModal } from './components/VocabTooltipModal';
 import { ComprehensionQuizModal } from './components/ComprehensionQuizModal';
 import { RSVPSpeedReaderModal } from './components/RSVPSpeedReaderModal';
@@ -15,6 +16,12 @@ import { LibraryImportModal } from './components/LibraryImportModal';
 import { AICatchUpModal } from './components/AICatchUpModal';
 import { InBookSearchModal } from './components/InBookSearchModal';
 import { TableOfContentsDrawer } from './components/TableOfContentsDrawer';
+import { ShelfModal } from './components/ShelfModal';
+import { TagModal } from './components/TagModal';
+import { BookShelvesTagsModal } from './components/BookShelvesTagsModal';
+import { CoverGeneratorModal } from './components/CoverGeneratorModal';
+import { CommunityPublishModal } from './components/CommunityPublishModal';
+import { ExportModal } from './components/ExportModal';
 import { OpenTaleAppIcon } from './components/OpenTaleLogo';
 import { Heart, Shield } from 'lucide-react';
 
@@ -63,6 +70,7 @@ const MainAppContent = () => {
         {activeTab === 'reader' && <ReaderView />}
         {activeTab === 'vocab' && <VocabVault />}
         {activeTab === 'badges' && <AchievementsView />}
+        {activeTab === 'author' && <AuthorStudioView />}
       </main>
 
       {/* Global Interactive Modals & Drawers */}
@@ -108,6 +116,14 @@ const MainAppContent = () => {
         isOpen={isTocOpen}
         onClose={() => setIsTocOpen(false)}
       />
+
+      {/* New Custom Shelves & Tags, Cover, Community & Export Modals */}
+      <ShelfModal />
+      <TagModal />
+      <BookShelvesTagsModal />
+      <CoverGeneratorModal />
+      <CommunityPublishModal />
+      <ExportModal />
 
       {/* Footer */}
       <footer className="bg-white border-t border-cozy-border py-8 mt-16 transition-colors duration-300">

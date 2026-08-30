@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useReading } from '../context/ReadingContext';
 import { parseUploadedFile } from '../utils/fileParser';
-import { 
-  ArrowLeft, ArrowRight, Bookmark, Volume2, VolumeX, Play, Pause, 
+import {
+  ArrowLeft, ArrowRight, Bookmark, Volume2, VolumeX, Play, Pause,
   X, HelpCircle, Highlighter, MessageSquare,
   Search, Upload, Loader2, List, Copy, Moon, Sun
 } from 'lucide-react';
@@ -12,6 +12,9 @@ export const ReaderView = () => {
     currentBook,
     activePageIndex,
     setActivePageIndex,
+
+
+
     goToNextPage,
     goToPrevPage,
     setActiveTab,
@@ -105,27 +108,27 @@ export const ReaderView = () => {
       // Next Page: J or ArrowRight / PageDown
       if (e.key === 'j' || e.key === 'J' || e.key === 'ArrowRight' || e.key === 'PageDown') {
         goToNextPage();
-      } 
+      }
       // Previous Page: K or ArrowLeft / PageUp
       else if (e.key === 'k' || e.key === 'K' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
         goToPrevPage();
-      } 
+      }
       // Toggle Theme: T
       else if (e.key === 't' || e.key === 'T') {
         const themes = ['white', 'sepia', 'oled'];
         const nextTheme = themes[(themes.indexOf(readerTheme) + 1) % themes.length];
         setReaderTheme(nextTheme);
         showToast(`Theme: ${nextTheme.toUpperCase()}`, '🎨');
-      } 
+      }
       // Distraction-Free Fullscreen: F
       else if (e.key === 'f' || e.key === 'F') {
         if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
+          document.documentElement.requestFullscreen().catch(() => { });
           showToast('Full Screen Mode', '📺');
         } else {
-          document.exitFullscreen().catch(() => {});
+          document.exitFullscreen().catch(() => { });
         }
-      } 
+      }
       // Table of Contents Drawer: C
       else if (e.key === 'c' || e.key === 'C') {
         setIsTocOpen(prev => !prev);
@@ -134,7 +137,7 @@ export const ReaderView = () => {
       else if (e.key === ' ') {
         e.preventDefault();
         speakCurrentPage();
-      } 
+      }
       // Escape: Close Settings or Return to Library Dashboard
       else if (e.key === 'Escape') {
         if (isSettingsOpen) {
@@ -241,7 +244,7 @@ export const ReaderView = () => {
             }
 
             return (
-              <span 
+              <span
                 key={wIdx}
                 onDoubleClick={handleWordDoubleClick}
                 className="hover:bg-black/5 rounded transition-colors cursor-text"
@@ -284,7 +287,7 @@ export const ReaderView = () => {
   const isBookmarked = isCurrentPageBookmarked();
 
   return (
-    <div 
+    <div
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -306,11 +309,11 @@ export const ReaderView = () => {
           <h3 className="font-serif text-xl font-bold">Opening Uploaded Book...</h3>
         </div>
       )}
-      
+
       {/* 1. TOP FLOATING NAVIGATION BAR (Auto-Hiding) */}
       <header className={`fixed top-0 left-0 right-0 z-40 ${currentStyle.navBg} backdrop-blur-md border-b transition-transform duration-300 ease-in-out ${isHeaderVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          
+
           {/* Left: Return to Library & Book Title */}
           <div className="flex items-center gap-3">
             <button
@@ -344,7 +347,7 @@ export const ReaderView = () => {
 
           {/* Right: Search, TOC, Settings, Bookmark, Audio */}
           <div className="flex items-center gap-2">
-            
+
             {/* Table of Contents Button (C) */}
             <button
               onClick={() => setIsTocOpen(true)}
@@ -398,7 +401,7 @@ export const ReaderView = () => {
       {/* 2. READING SETTINGS POPOVER ("Aa" Menu) */}
       {isSettingsOpen && (
         <div className={`fixed top-18 right-4 sm:right-12 z-50 w-80 p-5 rounded-3xl ${currentStyle.popoverBg} border space-y-5 animate-in fade-in slide-in-from-top-4 duration-200`}>
-          
+
           <div className="flex items-center justify-between border-b border-current/10 pb-3">
             <h4 className="font-sans font-bold text-xs uppercase tracking-wider opacity-80">Reading Customization</h4>
             <button onClick={() => setIsSettingsOpen(false)} className="p-1 rounded-full hover:bg-black/10">
@@ -540,13 +543,13 @@ export const ReaderView = () => {
       <main className="pt-24 pb-36 px-4 sm:px-6">
         {layoutMode === 'single' ? (
           /* Single Column Editorial Layout */
-          <div 
+          <div
             ref={canvasRef}
             onMouseUp={handleMouseUp}
             className={`mx-auto transition-all duration-300 ${fontStyle === 'serif' ? 'font-serif' : 'font-sans'}`}
-            style={{ 
+            style={{
               maxWidth: `${columnWidthPx}px`,
-              fontSize: `${fontSizePercent}%` 
+              fontSize: `${fontSizePercent}%`
             }}
           >
             {/* Chapter Opening Header */}
@@ -566,7 +569,7 @@ export const ReaderView = () => {
           </div>
         ) : (
           /* Two-Page Book Spread Layout (Simulates Physical Book / E-Reader) */
-          <div 
+          <div
             ref={canvasRef}
             onMouseUp={handleMouseUp}
             className={`max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 relative p-6 sm:p-10 rounded-3xl shadow-xl border border-current/10 bg-current/5 transition-all duration-300 ${fontStyle === 'serif' ? 'font-serif' : 'font-sans'}`}
@@ -621,11 +624,11 @@ export const ReaderView = () => {
 
       {/* Text Selection Floating Action Tooltip */}
       {selectionTooltipPos && (
-        <div 
+        <div
           style={{ top: `${selectionTooltipPos.top}px`, left: `${selectionTooltipPos.left}px` }}
           className="fixed z-50 -translate-x-1/2 bg-slate-950 text-white px-3 py-1.5 rounded-full shadow-2xl border border-slate-700 flex items-center gap-2 text-xs font-bold animate-in fade-in zoom-in-95 duration-150"
         >
-          <button 
+          <button
             onClick={() => {
               setDoubleTapWord(selectedText);
               setSelectionTooltipPos(null);
@@ -635,7 +638,7 @@ export const ReaderView = () => {
             <HelpCircle className="w-3.5 h-3.5 text-amber-400" /> Define
           </button>
           <div className="w-px h-3 bg-slate-700"></div>
-          <button 
+          <button
             onClick={() => {
               showToast(`Highlighted: "${selectedText.slice(0, 20)}..."`, '🖍️');
               setSelectionTooltipPos(null);
@@ -644,7 +647,7 @@ export const ReaderView = () => {
           >
             <Highlighter className="w-3.5 h-3.5 text-yellow-400" /> Highlight
           </button>
-          <button 
+          <button
             onClick={() => {
               const citation = `“${selectedText}”\n— ${currentBook?.title || 'OpenTale'}, ${currentPage?.title || 'Chapter ' + (activePageIndex + 1)} (By ${currentBook?.author || 'Author'})`;
               navigator.clipboard.writeText(citation);
@@ -656,7 +659,7 @@ export const ReaderView = () => {
             <Copy className="w-3.5 h-3.5 text-emerald-400" /> Copy Quote
           </button>
           <div className="w-px h-3 bg-slate-700"></div>
-          <button 
+          <button
             onClick={() => {
               setIsMarginaliaOpen(true);
               setSelectionTooltipPos(null);
@@ -671,7 +674,7 @@ export const ReaderView = () => {
       {/* 4. FLOATING BOTTOM CONTROL BAR WITH CHAPTER MARKERS & SCRUB BAR */}
       <div className="fixed bottom-6 left-0 right-0 z-40 px-4 pointer-events-none flex justify-center">
         <div className={`pointer-events-auto px-5 py-3 rounded-full ${currentStyle.controlBg} border backdrop-blur-xl flex flex-wrap items-center justify-between gap-4 max-w-3xl w-full shadow-2xl transition-all duration-300`}>
-          
+
           {/* Left: Previous Page */}
           <button
             onClick={goToPrevPage}
@@ -687,7 +690,7 @@ export const ReaderView = () => {
           <div className="flex-1 max-w-md mx-auto space-y-1.5 text-center">
             <div className="flex items-center justify-between text-[11px] font-bold opacity-75">
               <span className="truncate max-w-[150px]">
-                {hoveredNotchIndex !== null 
+                {hoveredNotchIndex !== null
                   ? currentBook?.pages[hoveredNotchIndex]?.title || `Chapter ${hoveredNotchIndex + 1}`
                   : `Page ${activePageIndex + 1} of ${totalPages}`
                 }
@@ -696,7 +699,7 @@ export const ReaderView = () => {
             </div>
 
             {/* Scrub Bar Container with Chapter Break Notches */}
-            <div 
+            <div
               className="relative w-full h-3 bg-black/10 rounded-full flex items-center cursor-pointer group px-0.5"
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -707,7 +710,7 @@ export const ReaderView = () => {
               }}
             >
               {/* Active Fill */}
-              <div 
+              <div
                 className="h-1.5 bg-amber-500 rounded-full transition-all duration-200"
                 style={{ width: `${progressPercent}%` }}
               ></div>
@@ -725,11 +728,10 @@ export const ReaderView = () => {
                       setActivePageIndex(idx);
                     }}
                     style={{ left: `${notchPosPercent}%` }}
-                    className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3 rounded-full transition-all cursor-pointer z-10 ${
-                      idx === activePageIndex 
-                        ? 'bg-amber-600 ring-2 ring-amber-300 scale-125' 
+                    className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3 rounded-full transition-all cursor-pointer z-10 ${idx === activePageIndex
+                        ? 'bg-amber-600 ring-2 ring-amber-300 scale-125'
                         : 'bg-black/30 hover:bg-amber-500 hover:scale-125'
-                    }`}
+                      }`}
                     title={currentBook?.pages[idx]?.title || `Chapter ${idx + 1}`}
                   />
                 );
@@ -739,7 +741,7 @@ export const ReaderView = () => {
 
           {/* Narration & Ambient Controls */}
           <div className="flex items-center gap-2">
-            
+
             {/* Search Trigger Shortcut */}
             <button
               onClick={() => setIsSearchModalOpen(true)}

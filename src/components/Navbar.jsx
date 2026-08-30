@@ -2,7 +2,7 @@ import React from 'react';
 import { useReading } from '../context/ReadingContext';
 import { OpenTaleAppIcon } from './OpenTaleLogo';
 import { 
-  BookOpen, Sparkles, Award, BookMarked, Database 
+  BookOpen, Sparkles, Award, BookMarked, Database, PenTool 
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -22,7 +22,7 @@ export const Navbar = () => {
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-100 transition-colors duration-300 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Brand Logo (Sleek & Proportional) */}
+        {/* Brand Logo */}
         <div 
           onClick={() => setActiveTab('landing')}
           className="flex items-center gap-2.5 cursor-pointer group select-none py-1"
@@ -30,7 +30,7 @@ export const Navbar = () => {
           <OpenTaleAppIcon className="w-9 h-9 sm:w-10 sm:h-10 group-hover:scale-105 transition-transform duration-300 shadow-sm" />
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-sans text-xl sm:text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white">
+              <span className="font-sans text-xl sm:text-2xl font-extrabold tracking-tight text-slate-800">
                 OpenTale
               </span>
               <span className="px-2 py-0.5 rounded-full bg-peach-100 text-peach-800 text-[10px] font-bold shadow-2xs border border-peach-200/60">
@@ -41,7 +41,7 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Navigation Tabs (Centered & Prominent) */}
+        {/* Navigation Tabs */}
         <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/60 shadow-inner-soft">
           <button
             onClick={() => setActiveTab('landing')}
@@ -59,6 +59,15 @@ export const Navbar = () => {
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" /> Library
+          </button>
+
+          <button
+            onClick={() => setActiveTab('author')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'author' ? 'bg-peach-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <PenTool className="w-3.5 h-3.5" /> Author Studio
           </button>
 
           <button
@@ -120,10 +129,16 @@ export const Navbar = () => {
           <BookOpen className="w-4 h-4" /> Library
         </button>
         <button 
+          onClick={() => setActiveTab('author')}
+          className={`flex flex-col items-center gap-1 text-xs font-medium ${activeTab === 'author' ? 'text-peach-600 font-bold' : 'text-cozy-muted'}`}
+        >
+          <PenTool className="w-4 h-4" /> Author
+        </button>
+        <button 
           onClick={() => setActiveTab('vocab')}
           className={`flex flex-col items-center gap-1 text-xs font-medium ${activeTab === 'vocab' ? 'text-peach-600 font-bold' : 'text-cozy-muted'}`}
         >
-          <BookMarked className="w-4 h-4" /> Vocab ({vocabVault.length})
+          <BookMarked className="w-4 h-4" /> Vocab
         </button>
         <button 
           onClick={() => setActiveTab('badges')}
