@@ -3,8 +3,12 @@
  * Allows storing, retrieving, and publishing stories, custom shelves, color-coded tags, and community items.
  */
 
-const SUPABASE_URL = typeof window !== 'undefined' ? (window.ENV_SUPABASE_URL || 'https://demo-opentale.supabase.co') : '';
-const SUPABASE_ANON_KEY = typeof window !== 'undefined' ? (window.ENV_SUPABASE_ANON_KEY || 'demo-anon-key') : '';
+const SUPABASE_URL = typeof window !== 'undefined' 
+  ? (window.ENV_SUPABASE_URL || (import.meta && import.meta.env && import.meta.env.VITE_SUPABASE_URL) || 'https://demo-opentale.supabase.co') 
+  : '';
+const SUPABASE_ANON_KEY = typeof window !== 'undefined' 
+  ? (window.ENV_SUPABASE_ANON_KEY || (import.meta && import.meta.env && import.meta.env.VITE_SUPABASE_ANON_KEY) || 'demo-anon-key') 
+  : '';
 
 export const supabaseClient = {
   /**
